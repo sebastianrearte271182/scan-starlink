@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escáner Starlink - Telespazio</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { padding: 15px; background-color: #f5f7fb; margin: 0; color: #333; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        h2 { margin-top: 0; color: #0f2c59; font-size: 1.4rem; display: flex; align-items: center; gap: 8px; }
+        label { font-weight: bold; font-size: 0.9rem; color: #555; display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #ccd4e0; border-radius: 8px; font-size: 1rem; transition: border 0.2s; }
+        input:focus { border-color: #0056b3; outline: none; }
+        #reader { width: 100%; border-radius: 8px; overflow: hidden; border: none; background: #000; }
+        .btn { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background: #0056b3; }
+        .btn-share { background: #28a745; margin-top: 15px; }
+        .btn-share:hover { background: #218838; }
+        .counter { float: right; background: #0f2c59; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85rem; }
+        ul { list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
+        li { padding: 12px; border-bottom: 1px solid #eee; font-family: monospace; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        li:last-child { border-bottom: none; }
+        .delete-btn { color: #dc3545; font-weight: bold; cursor: pointer; padding: 0 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>📦 Datos del Despacho</h2>
+        <label for="cliente">CLIENTE DESTINO</label>
+        <input type="text" id="cliente" placeholder="Ej: PASON" autocomplete="off">
+        
+        <label for="remito">NÚMERO DE REMITO</label>
+        <input type="text" id="remito" placeholder="Ej: 1-00004814" autocomplete="off">
+    </div>
+
+    <div class="card">
+        <h2>📷 Escáner de Códigos</h2>
+        <div id="reader"></div>
+    </div>
+
+    <div class="card">
+        <h2>📋 Equipos Escaneados <span class="counter" id="count">0</span></h2>
+        <ul id="listaSeriales"></ul>
+        <button class="btn btn-share" onclick="compartirAOneDrive()">🚀 Enviar a OneDrive</button>
+    </div>
+
+    <script>
+        let seriales = [];
+
+        // Inicializar el escáner nativo de la cámara
+        function onScanSuccess(decodedText, decodedResult) {
+            let limpio = decodedText.trim();
+            
+            if (limpio && !seriales.includes(limpio)) {
+                seriales.push(limpio);
+                actualizarLista();
+                
+                if (navigator.vibrate) navigator.vibrate(100);
+            }
+        }
+
+        function actualizarLista() {
+            document.getElementById("count").innerText = seriales.length;
+            const lista = document.getElementById("listaSeriales");
+            lista.innerHTML = "";
+            
+            for (let i = seriales.length - 1; i >= 0; i--) {
+                let li = document.createElement("li");
+                li.innerHTML = `<span>${seriales[i]}</span><span class="delete-btn" onclick="eliminarSerial(${i})">✕</span>`;
+                lista.appendChild(li);
+            }
+        }
+
+        function eliminarSerial(index) {
+            seriales.splice(index, 1);
+            actualizarLista();
+        }
+
+        const html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+            fps: 15, 
+            qrbox: { width: 250, height: 150 },
+            formatsToSupport: [ 
+                Html5QrcodeSupportedFormats.QR_CODE,
+                Html5QrcodeSupportedFormats.CODE_128, 
+                Html5QrcodeSupportedFormats.CODE_39
+            ]
+        });
+        html5QrcodeScanner.render(onScanSuccess);
+
+        async function compartirAOneDrive() {
+            const cliente = document.getElementById("cliente").value.trim().toUpperCase();
+            const remito = document.getElementById("remito").value.trim();
+            
+            if (!cliente || !remito) {
+                alert("❌ Por favor, completá los campos de Cliente y Remito primero.");
+                return;
+            }
+            if (seriales.length === 0) {
+                alert("❌ No escaneaste ningún número de serie todavía.");
+                return;
+            }
+
+            const nombreArchivo = `${cliente} - ${remito}.txt`;
+            const contenido = seriales.join("\n");
+            
+            const file = new File([contenido], nombreArchivo, { type: "text/plain" });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: nombreArchivo
+                    });
+                } catch (error) {
+                    console.log("El usuario canceló el envío", error);
+                }
+            } else {
+                alert("Tu navegador no soporta el envío directo de archivos. Probá abriendo la app desde Chrome actualizado.");
+            }
+        }
+    </script>
+</body>
+</html>
