@@ -20,6 +20,8 @@
             overflow: hidden; 
             border: none; 
             background: #000; 
+    #reader video { 
+    object-fit: cover;
         }        .btn { width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn:hover { background: #0056b3; }
         .btn-share { background: #28a745; margin-top: 15px; }
@@ -87,15 +89,18 @@
         // --- INICIALIZACIÓN DE CÁMARA TRASERA FORZADA ---
         const html5QrCode = new Html5Qrcode("reader");
 
+        // Configuramos un qrbox pequeño (width: 250, height: 90) para que quepa en 130px
+        const config = { fps: 10, qrbox: { width: 250, height: 90 } };
+
         html5QrCode.start(
             { facingMode: { exact: "environment" } }, 
-            { fps: 15, qrbox: { width: 150, height: 100 } },
+            config,
             onScanSuccess
         ).catch(err => {
-            console.log("Forzado exacto falló, intentando con entorno estándar...", err);
+            console.log("Forzado exacto falló, intentando con entorno estándar...");
             html5QrCode.start(
                 { facingMode: "environment" },
-                { fps: 15, qrbox: { width: 250, height: 150 } },
+                config, // Usamos la misma config pequeña
                 onScanSuccess
             ).catch(err2 => console.error("No se pudo acceder a la cámara:", err2));
         });
