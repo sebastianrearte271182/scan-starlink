@@ -89,7 +89,7 @@
 
         html5QrCode.start(
             { facingMode: { exact: "environment" } }, 
-            { fps: 15, qrbox: { width: 250, height: 150 } },
+            { fps: 15, qrbox: { width: 150, height: 100 } },
             onScanSuccess
         ).catch(err => {
             console.log("Forzado exacto falló, intentando con entorno estándar...", err);
