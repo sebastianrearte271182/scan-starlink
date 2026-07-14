@@ -50,7 +50,6 @@
     <script>
         let seriales = [];
 
-        // Inicializar el escáner nativo de la cámara
         function onScanSuccess(decodedText, decodedResult) {
             let limpio = decodedText.trim();
             
@@ -79,16 +78,21 @@
             actualizarLista();
         }
 
-        const html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-            fps: 15, 
-            qrbox: { width: 250, height: 150 },
-            formatsToSupport: [ 
-                Html5QrcodeSupportedFormats.QR_CODE,
-                Html5QrcodeSupportedFormats.CODE_128, 
-                Html5QrcodeSupportedFormats.CODE_39
-            ]
+        // --- INICIALIZACIÓN DE CÁMARA TRASERA FORZADA ---
+        const html5QrCode = new Html5Qrcode("reader");
+
+        html5QrCode.start(
+            { facingMode: { exact: "environment" } }, 
+            { fps: 15, qrbox: { width: 250, height: 150 } },
+            onScanSuccess
+        ).catch(err => {
+            console.log("Forzado exacto falló, intentando con entorno estándar...", err);
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 15, qrbox: { width: 250, height: 150 } },
+                onScanSuccess
+            ).catch(err2 => console.error("No se pudo acceder a la cámara:", err2));
         });
-        html5QrcodeScanner.render(onScanSuccess);
 
         async function compartirAOneDrive() {
             const cliente = document.getElementById("cliente").value.trim().toUpperCase();
