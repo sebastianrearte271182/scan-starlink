@@ -48,6 +48,8 @@ button{
     cursor:pointer;
 }
 .btnAgregar{ background:#28a745; }
+.btnEscanear{ background:#6c757d; }
+.btnDetener{ background:#dc3545; margin-top: 5px; }
 .btnCSV{ background:#0078d4; }
 .btnLimpiar{ background:#dc3545; }
 .oculto{ display:none; }
@@ -70,7 +72,15 @@ li{
     padding:4px 8px;
     border-radius:10px;
 }
+#reader{
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+}
 </style>
+<!-- Librería para escaneo de códigos de barras / QR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 
@@ -140,7 +150,12 @@ li{
 <div class="card">
     <label>Kit ID</label>
     <input id="kitInput" placeholder="KIT00001" onkeypress="if(event.key==='Enter') agregarKit()">
+    
     <button class="btnAgregar" onclick="agregarKit()">➕ Agregar Kit</button>
+    <button class="btnEscanear" onclick="iniciarEscaneo()">📷 Escanear con Cámara</button>
+    
+    <div id="reader" class="oculto"></div>
+    <button id="btnDetenerCamara" class="btnDetener oculto" onclick="detenerEscaneo()">❌ Cerrar Cámara</button>
 </div>
 
 <div class="card">
@@ -152,6 +167,7 @@ li{
 
 <script>
 let equipos = [];
+let html5QrCode = null;
 
 function cambiarOperacion(){
     const operacion = document.getElementById("operacion").value;
@@ -216,9 +232,56 @@ function limpiarLista(){
     actualizarLista();
 }
 
+function iniciarEscaneo() {
+    const readerDiv = document.getElementById("reader");
+    const btnDetener = document.getElementById("btnDetenerCamara");
+    
+    readerDiv.classList.remove("oculto");
+    btnDetener.classList.remove("oculto");
+
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+    }
+
+    html5QrCode.start(
+        { facingMode: "environment" }, // Usa la cámara trasera por defecto
+        {
+            fps: 10,
+            qrbox: { width: 250, height: 150 }
+        },
+        (decodedText, decodedResult) => {
+            // Al detectar un código con éxito
+            document.getElementById("kitInput").value = decodedText.trim().toUpperCase();
+            detenerEscaneo();
+            agregarKit(); // Lo agrega automáticamente a la lista
+        },
+        (errorMessage) => {
+            // Errores de frame (se ignoran para que siga buscando fluidamente)
+        }
+    ).catch(err => {
+        alert("No se pudo acceder a la cámara. Asegúrate de dar permisos o usar HTTPS.");
+        detenerEscaneo();
+    });
+}
+
+function detenerEscaneo() {
+    if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+            document.getElementById("reader").classList.add("oculto");
+            document.getElementById("btnDetenerCamara").classList.add("oculto");
+        }).catch(err => {
+            console.error("Error al detener la cámara", err);
+        });
+    } else {
+        document.getElementById("reader").classList.add("oculto");
+        document.getElementById("btnDetenerCamara").classList.add("oculto");
+    }
+}
+
 function generarCSV(){
     if(equipos.length === 0){
         alert("No hay kits cargados");
+        consoleg.log("No kits");
         return;
     }
 
@@ -246,7 +309,6 @@ function generarCSV(){
         });
     }
 
-    // Disparar la descarga del archivo CSV
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
