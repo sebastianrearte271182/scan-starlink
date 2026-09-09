@@ -40,7 +40,8 @@ label{
 }
 
 input,
-select{
+select,
+textarea{
     width:100%;
     padding:12px;
     border:1px solid #ccc;
@@ -70,27 +71,15 @@ button{
     background:#dc3545;
 }
 
-.oculto{
-    display:none;
-}
-
-ul{
-    list-style:none;
-    padding:0;
-}
-
 li{
-    background:#f5f5f5;
+    background:#f7f7f7;
     padding:10px;
     margin-bottom:5px;
-    border-radius:6px;
+    border-radius:5px;
 }
 
-.badge{
-    background:#16325c;
-    color:white;
-    padding:3px 8px;
-    border-radius:10px;
+.oculto{
+    display:none;
 }
 
 </style>
@@ -135,37 +124,25 @@ value="Ingreso de equipo nuevo">
 <div class="card oculto" id="panelMovimiento">
 
 <label>Partner</label>
-
-<select id="partnerId">
-    <option value="">Cargando Partners...</option>
-</select>
+<input id="partnerId">
 
 <label>Customer</label>
-
-<input
-id="customerId"
-placeholder="Customer ID">
+<input id="customerId">
 
 <label>Ownership</label>
 
-<select
-id="ownershipType"
-onchange="mostrarLease()">
-
+<select id="ownershipType" onchange="mostrarLease()">
     <option value="byo">BYO</option>
     <option value="leased">Leased</option>
     <option value="owned">Owned</option>
-
 </select>
 
 <div id="leaseBlock" class="oculto">
 
-<label>Contrato Leasing</label>
-
+<label>Contrato</label>
 <input id="ownershipContractRef">
 
 <label>Fin Leasing</label>
-
 <input
 type="date"
 id="ownershipLeaseEndsAt">
@@ -180,51 +157,32 @@ id="ownershipLeaseEndsAt">
 
 <input
 id="kitInput"
-placeholder="KIT00001"
-onkeypress="if(event.key==='Enter') agregarKit()">
+placeholder="Ej: KIT00001">
 
 <button
 class="btnAgregar"
 onclick="agregarKit()">
-
-➕ Agregar Kit
-
+Agregar Kit
 </button>
 
 </div>
 
 <div class="card">
 
-<h3>
-
-Equipos Cargados
-
-<span
-id="contador"
-class="badge">
-
-0
-
-</span>
-
-</h3>
+<h3>Equipos Escaneados: <span id="contador">0</span></h3>
 
 <ul id="lista"></ul>
 
 <button
 class="btnCSV"
 onclick="generarCSV()">
-
-⬇ Descargar CSV
-
+Descargar CSV
 </button>
 
 <button
 class="btnLimpiar"
 onclick="limpiarLista()">
-
-🗑 Limpiar Lista
-
+Limpiar Lista
 </button>
 
 </div>
@@ -232,53 +190,6 @@ onclick="limpiarLista()">
 <script>
 
 let equipos = [];
-
-async function cargarPartners(){
-
-    try{
-
-        const response =
-            await fetch("partners.json");
-
-        const partners =
-            await response.json();
-
-        const combo =
-            document.getElementById(
-                "partnerId"
-            );
-
-        combo.innerHTML =
-            '<option value="">Seleccione Partner</option>';
-
-        partners.forEach(partner => {
-
-            let option =
-                document.createElement("option");
-
-            option.value =
-                partner.id;
-
-            option.textContent =
-                partner.nombre;
-
-            combo.appendChild(option);
-
-        });
-
-    }
-    catch(error){
-
-        console.error(error);
-
-        document.getElementById(
-            "partnerId"
-        ).innerHTML =
-        '<option>Error cargando Partners</option>';
-
-    }
-
-}
 
 function cambiarOperacion(){
 
@@ -291,46 +202,28 @@ function cambiarOperacion(){
     let movimiento =
         document.getElementById("panelMovimiento");
 
-    if(operacion==="stock"){
-
+    if(operacion === "stock"){
         stock.classList.remove("oculto");
         movimiento.classList.add("oculto");
-
-    }
-    else{
-
+    }else{
         stock.classList.add("oculto");
         movimiento.classList.remove("oculto");
-
     }
 
 }
 
 function mostrarLease(){
 
-    let ownership =
-        document.getElementById(
-            "ownershipType"
-        ).value;
+    const ownership =
+        document.getElementById("ownershipType").value;
 
-    let bloque =
-        document.getElementById(
-            "leaseBlock"
-        );
+    const bloque =
+        document.getElementById("leaseBlock");
 
-    if(ownership==="leased"){
-
-        bloque.classList.remove(
-            "oculto"
-        );
-
-    }
-    else{
-
-        bloque.classList.add(
-            "oculto"
-        );
-
+    if(ownership === "leased"){
+        bloque.classList.remove("oculto");
+    }else{
+        bloque.classList.add("oculto");
     }
 
 }
@@ -338,27 +231,23 @@ function mostrarLease(){
 function agregarKit(){
 
     let kit =
-        document.getElementById(
-            "kitInput"
-        )
+        document.getElementById("kitInput")
         .value
         .trim()
         .toUpperCase();
 
-    if(!kit) return;
+    if(!kit){
+        return;
+    }
 
     if(equipos.includes(kit)){
-
-        alert("Kit duplicado");
+        alert("El kit ya fue agregado");
         return;
-
     }
 
     equipos.push(kit);
 
-    document.getElementById(
-        "kitInput"
-    ).value="";
+    document.getElementById("kitInput").value="";
 
     actualizarLista();
 
@@ -366,28 +255,20 @@ function agregarKit(){
 
 function actualizarLista(){
 
-    document.getElementById(
-        "contador"
-    ).innerText =
+    document.getElementById("contador").innerText =
         equipos.length;
 
-    let lista =
-        document.getElementById(
-            "lista"
-        );
+    const lista =
+        document.getElementById("lista");
 
-    lista.innerHTML="";
+    lista.innerHTML = "";
 
-    equipos.forEach((kit,index)=>{
+    equipos.forEach(kit=>{
 
         let li =
             document.createElement("li");
 
-        li.innerHTML =
-            kit +
-            ' <a href="#" onclick="eliminarKit(' +
-            index +
-            ');return false;">❌</a>';
+        li.innerText = kit;
 
         lista.appendChild(li);
 
@@ -395,17 +276,9 @@ function actualizarLista(){
 
 }
 
-function eliminarKit(index){
-
-    equipos.splice(index,1);
-
-    actualizarLista();
-
-}
-
 function limpiarLista(){
 
-    equipos=[];
+    equipos = [];
 
     actualizarLista();
 
@@ -413,69 +286,41 @@ function limpiarLista(){
 
 function generarCSV(){
 
-    if(equipos.length===0){
-
-        alert("No hay kits cargados");
-        return;
-
-    }
-
     let operacion =
-        document.getElementById(
-            "operacion"
-        ).value;
+        document.getElementById("operacion").value;
 
-    let csv="";
+    let csv = "";
 
-    if(operacion==="stock"){
+    if(operacion === "stock"){
 
         let motivo =
-            document.getElementById(
-                "reason"
-            ).value;
+            document.getElementById("reason").value;
 
-        let location =
-            document.getElementById(
-                "location"
-            ).value;
+        let ubicacion =
+            document.getElementById("location").value;
 
         csv =
-        "kitId,state,reason,location\n";
+            "kitId,state,reason,location\n";
 
         equipos.forEach(kit=>{
 
             csv +=
-`${kit},in_stock,${motivo},${location}\n`;
+`${kit},in_stock,${motivo},${ubicacion}\n`;
 
         });
 
     }
+
     else{
 
-        let partner =
-            document.getElementById(
-                "partnerId"
-            ).value;
-
-        let customer =
-            document.getElementById(
-                "customerId"
-            ).value;
-
         let ownership =
-            document.getElementById(
-                "ownershipType"
-            ).value;
+            document.getElementById("ownershipType").value;
 
         let contrato =
-            document.getElementById(
-                "ownershipContractRef"
-            ).value;
+            document.getElementById("ownershipContractRef").value;
 
         let lease =
-            document.getElementById(
-                "ownershipLeaseEndsAt"
-            ).value;
+            document.getElementById("ownershipLeaseEndsAt").value;
 
         csv =
 "kitId,kitSerialNumber,inventoryState,serviceLineState,location,partnerId,customerId,updatedAt,ownershipType,ownershipContractRef,ownershipLeaseEndsAt\n";
@@ -483,25 +328,21 @@ function generarCSV(){
         equipos.forEach(kit=>{
 
             csv +=
-`${kit},,${operacion},,,,${partner},${customer},,${ownership},${contrato},${lease}\n`;
+`${kit},,${operacion},,,,,,${ownership},${contrato},${lease}\n`;
 
         });
 
     }
 
     const blob =
-        new Blob(
-            [csv],
-            {type:"text/csv"}
-        );
+        new Blob([csv],
+        {type:"text/csv"});
 
     const link =
         document.createElement("a");
 
     link.href =
-        URL.createObjectURL(
-            blob
-        );
+        URL.createObjectURL(blob);
 
     link.download =
         "inventario.csv";
@@ -510,7 +351,6 @@ function generarCSV(){
 
 }
 
-cargarPartners();
 cambiarOperacion();
 
 </script>
