@@ -30,6 +30,12 @@ body{
 h1{
     text-align:center;
     color:#16325c;
+    margin-bottom:20px;
+}
+
+h2{
+    color:#16325c;
+    margin-top:0;
 }
 
 label{
@@ -40,8 +46,7 @@ label{
 }
 
 input,
-select,
-textarea{
+select{
     width:100%;
     padding:12px;
     border:1px solid #ccc;
@@ -50,12 +55,12 @@ textarea{
 
 button{
     width:100%;
-    padding:15px;
+    padding:14px;
     margin-top:10px;
     border:none;
     border-radius:8px;
-    color:white;
     font-size:16px;
+    color:white;
     cursor:pointer;
 }
 
@@ -71,119 +76,166 @@ button{
     background:#dc3545;
 }
 
+ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
 li{
     background:#f7f7f7;
-    padding:10px;
     margin-bottom:5px;
-    border-radius:5px;
+    padding:10px;
+    border-radius:6px;
 }
 
 .oculto{
     display:none;
 }
 
-</style>
-</head>
+.badge{
+    background:#16325c;
+    color:white;
+    padding:3px 8px;
+    border-radius:10px;
+}
 
+</style>
+
+</head>
 <body>
 
 <h1>📦 Inventario Starlink</h1>
 
 <div class="card">
 
-<label>Operación</label>
+    <h2>Operación</h2>
 
-<select id="operacion" onchange="cambiarOperacion()">
-    <option value="stock">Alta Stock</option>
-    <option value="reserved">Reserva</option>
-    <option value="shipped">Despacho</option>
-    <option value="delivered">Entrega</option>
-</select>
+    <select id="operacion" onchange="cambiarOperacion()">
+        <option value="stock">Alta de Stock</option>
+        <option value="reserved">Reserva</option>
+        <option value="shipped">Despacho</option>
+        <option value="delivered">Entrega</option>
+    </select>
 
 </div>
 
 <div class="card" id="panelStock">
 
-<label>Ubicación</label>
+    <h2>Alta de Stock</h2>
 
-<select id="location">
-    <option>Quesada</option>
-    <option>CdS - NQN</option>
-    <option>Depo PE</option>
-    <option>Ramm</option>
-</select>
+    <label>Ubicación</label>
 
-<label>Motivo</label>
+    <select id="location">
+        <option>Quesada</option>
+        <option>CdS - NQN</option>
+        <option>Depo PE</option>
+        <option>Ramm</option>
+    </select>
 
-<input
-id="reason"
-value="Ingreso de equipo nuevo">
+    <label>Motivo</label>
+
+    <input id="reason" value="Ingreso de equipo nuevo">
 
 </div>
 
 <div class="card oculto" id="panelMovimiento">
 
-<label>Partner</label>
-<input id="partnerId">
+    <h2>Datos Comerciales</h2>
 
-<label>Customer</label>
-<input id="customerId">
+    <label>Partner</label>
 
-<label>Ownership</label>
+    <select id="partnerId">
+        <option value="">Seleccione Partner</option>
+        <option value="ait">AITUE</option>
+        <option value="cirion">CIRION</option>
+        <option value="cmpc">CMPC</option>
+        <option value="itx-pe">INTERNEXA</option>
+        <option value="muncl">MUNDO</option>
+        <option value="redc">REDCOL</option>
+        <option value="sonda">SONDA</option>
+        <option value="tpzarg">TPZ-Argentina</option>
+        <option value="tpzchile">TPZ-Chile</option>
+        <option value="tpzcol">TPZ-Colombia</option>
+        <option value="tpzcostarica">TPZ-Costa Rica</option>
+        <option value="tpzdemo">TPZ-Ops</option>
+        <option value="tpzglobal">TPZ-Global</option>
+        <option value="tpzperu">TPZ-Peru</option>
+    </select>
 
-<select id="ownershipType" onchange="mostrarLease()">
-    <option value="byo">BYO</option>
-    <option value="leased">Leased</option>
-    <option value="owned">Owned</option>
-</select>
+    <label>Customer</label>
+    <input id="customerId">
 
-<div id="leaseBlock" class="oculto">
+    <label>Ownership</label>
 
-<label>Contrato</label>
-<input id="ownershipContractRef">
+    <select id="ownershipType" onchange="mostrarLease()">
+        <option value="byo">BYO (Venta)</option>
+        <option value="leased">Leased</option>
+        <option value="owned">Owned</option>
+    </select>
 
-<label>Fin Leasing</label>
-<input
-type="date"
-id="ownershipLeaseEndsAt">
+    <div id="leaseBlock" class="oculto">
 
-</div>
+        <label>Contrato</label>
+        <input id="ownershipContractRef">
+
+        <label>Fin Leasing</label>
+        <input type="date" id="ownershipLeaseEndsAt">
+
+    </div>
 
 </div>
 
 <div class="card">
 
-<label>Kit ID</label>
+    <h2>Carga de Kits</h2>
 
-<input
-id="kitInput"
-placeholder="Ej: KIT00001">
+    <label>Kit ID</label>
 
-<button
-class="btnAgregar"
-onclick="agregarKit()">
-Agregar Kit
-</button>
+    <input
+        id="kitInput"
+        placeholder="Ej: KIT00001">
+
+    <button
+        class="btnAgregar"
+        onclick="agregarKit()">
+
+        ➕ Agregar Kit
+
+    </button>
 
 </div>
 
 <div class="card">
 
-<h3>Equipos Escaneados: <span id="contador">0</span></h3>
+    <h2>
+        Equipos Cargados
+        <span
+            id="contador"
+            class="badge">
 
-<ul id="lista"></ul>
+            0
 
-<button
-class="btnCSV"
-onclick="generarCSV()">
-Descargar CSV
-</button>
+        </span>
+    </h2>
 
-<button
-class="btnLimpiar"
-onclick="limpiarLista()">
-Limpiar Lista
-</button>
+    <ul id="lista"></ul>
+
+    <button
+        class="btnCSV"
+        onclick="generarCSV()">
+
+        ⬇ Descargar CSV
+
+    </button>
+
+    <button
+        class="btnLimpiar"
+        onclick="limpiarLista()">
+
+        🗑 Limpiar Lista
+
+    </button>
 
 </div>
 
@@ -196,34 +248,44 @@ function cambiarOperacion(){
     let operacion =
         document.getElementById("operacion").value;
 
-    let stock =
+    let panelStock =
         document.getElementById("panelStock");
 
-    let movimiento =
+    let panelMovimiento =
         document.getElementById("panelMovimiento");
 
     if(operacion === "stock"){
-        stock.classList.remove("oculto");
-        movimiento.classList.add("oculto");
-    }else{
-        stock.classList.add("oculto");
-        movimiento.classList.remove("oculto");
+
+        panelStock.classList.remove("oculto");
+        panelMovimiento.classList.add("oculto");
+
+    }
+    else{
+
+        panelStock.classList.add("oculto");
+        panelMovimiento.classList.remove("oculto");
+
     }
 
 }
 
 function mostrarLease(){
 
-    const ownership =
+    let ownership =
         document.getElementById("ownershipType").value;
 
-    const bloque =
+    let leaseBlock =
         document.getElementById("leaseBlock");
 
     if(ownership === "leased"){
-        bloque.classList.remove("oculto");
-    }else{
-        bloque.classList.add("oculto");
+
+        leaseBlock.classList.remove("oculto");
+
+    }
+    else{
+
+        leaseBlock.classList.add("oculto");
+
     }
 
 }
@@ -236,12 +298,12 @@ function agregarKit(){
         .trim()
         .toUpperCase();
 
-    if(!kit){
+    if(kit === ""){
         return;
     }
 
     if(equipos.includes(kit)){
-        alert("El kit ya fue agregado");
+        alert("El kit ya existe.");
         return;
     }
 
@@ -258,12 +320,12 @@ function actualizarLista(){
     document.getElementById("contador").innerText =
         equipos.length;
 
-    const lista =
+    let lista =
         document.getElementById("lista");
 
     lista.innerHTML = "";
 
-    equipos.forEach(kit=>{
+    equipos.forEach(function(kit){
 
         let li =
             document.createElement("li");
@@ -300,60 +362,4 @@ function generarCSV(){
             document.getElementById("location").value;
 
         csv =
-            "kitId,state,reason,location\n";
-
-        equipos.forEach(kit=>{
-
-            csv +=
-`${kit},in_stock,${motivo},${ubicacion}\n`;
-
-        });
-
-    }
-
-    else{
-
-        let ownership =
-            document.getElementById("ownershipType").value;
-
-        let contrato =
-            document.getElementById("ownershipContractRef").value;
-
-        let lease =
-            document.getElementById("ownershipLeaseEndsAt").value;
-
-        csv =
-"kitId,kitSerialNumber,inventoryState,serviceLineState,location,partnerId,customerId,updatedAt,ownershipType,ownershipContractRef,ownershipLeaseEndsAt\n";
-
-        equipos.forEach(kit=>{
-
-            csv +=
-`${kit},,${operacion},,,,,,${ownership},${contrato},${lease}\n`;
-
-        });
-
-    }
-
-    const blob =
-        new Blob([csv],
-        {type:"text/csv"});
-
-    const link =
-        document.createElement("a");
-
-    link.href =
-        URL.createObjectURL(blob);
-
-    link.download =
-        "inventario.csv";
-
-    link.click();
-
-}
-
-cambiarOperacion();
-
-</script>
-
-</body>
-</html>
+            "kitId,
