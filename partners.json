@@ -1,0 +1,58 @@
+[
+  {
+    "nombre": "AITUE",
+    "id": "ait"
+  },
+  {
+    "nombre": "CIRION",
+    "id": "cirion"
+  },
+  {
+    "nombre": "CMPC",
+    "id": "cmpc"
+  },
+  {
+    "nombre": "INTERNEXA",
+    "id": "itx-pe"
+  },
+  {
+    "nombre": "MUNDO",
+    "id": "muncl"
+  },
+  {
+    "nombre": "REDCOL",
+    "id": "redc"
+  },
+  {
+    "nombre": "SONDA",
+    "id": "sonda"
+  },
+  {
+    "nombre": "TPZ-Argentina",
+    "id": "tpzarg"
+  },
+  {
+    "nombre": "TPZ-Chile",
+    "id": "tpzchile"
+  },
+  {
+    "nombre": "TPZ-Colombia",
+    "id": "tpzcol"
+  },
+  {
+    "nombre": "TPZ-Costa Rica",
+    "id": "tpzcostarica"
+  },
+  {
+    "nombre": "TPZ-Ops",
+    "id": "tpzdemo"
+  },
+  {
+    "nombre": "TPZ-Global",
+    "id": "tpzglobal"
+  },
+  {
+    "nombre": "TPZ-Peru",
+    "id": "tpzperu"
+  }
+]
