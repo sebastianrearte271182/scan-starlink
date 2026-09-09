@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Inventario Starlink</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    margin:0;
+    padding:15px;
+    background:#f4f6f9;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+h1{
+    text-align:center;
+    color:#16325c;
+}
+
+label{
+    display:block;
+    margin-top:10px;
+    margin-bottom:5px;
+    font-weight:bold;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    margin-top:10px;
+    border:none;
+    border-radius:8px;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.btnAgregar{
+    background:#28a745;
+}
+
+.btnCSV{
+    background:#0078d4;
+}
+
+.btnLimpiar{
+    background:#dc3545;
+}
+
+li{
+    background:#f7f7f7;
+    padding:10px;
+    margin-bottom:5px;
+    border-radius:5px;
+}
+
+.oculto{
+    display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>📦 Inventario Starlink</h1>
+
+<div class="card">
+
+<label>Operación</label>
+
+<select id="operacion" onchange="cambiarOperacion()">
+    <option value="stock">Alta Stock</option>
+    <option value="reserved">Reserva</option>
+    <option value="shipped">Despacho</option>
+    <option value="delivered">Entrega</option>
+</select>
+
+</div>
+
+<div class="card" id="panelStock">
+
+<label>Ubicación</label>
+
+<select id="location">
+    <option>Quesada</option>
+    <option>CdS - NQN</option>
+    <option>Depo PE</option>
+    <option>Ramm</option>
+</select>
+
+<label>Motivo</label>
+
+<input
+id="reason"
+value="Ingreso de equipo nuevo">
+
+</div>
+
+<div class="card oculto" id="panelMovimiento">
+
+<label>Partner</label>
+<input id="partnerId">
+
+<label>Customer</label>
+<input id="customerId">
+
+<label>Ownership</label>
+
+<select id="ownershipType" onchange="mostrarLease()">
+    <option value="byo">BYO</option>
+    <option value="leased">Leased</option>
+    <option value="owned">Owned</option>
+</select>
+
+<div id="leaseBlock" class="oculto">
+
+<label>Contrato</label>
+<input id="ownershipContractRef">
+
+<label>Fin Leasing</label>
+<input
+type="date"
+id="ownershipLeaseEndsAt">
+
+</div>
+
+</div>
+
+<div class="card">
+
+<label>Kit ID</label>
+
+<input
+id="kitInput"
+placeholder="Ej: KIT00001">
+
+<button
+class="btnAgregar"
+onclick="agregarKit()">
+Agregar Kit
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Equipos Escaneados: <span id="contador">0</span></h3>
+
+<ul id="lista"></ul>
+
+<button
+class="btnCSV"
+onclick="generarCSV()">
+Descargar CSV
+</button>
+
+<button
+class="btnLimpiar"
+onclick="limpiarLista()">
+Limpiar Lista
+</button>
+
+</div>
+
+<script>
+
+let equipos = [];
+
+function cambiarOperacion(){
+
+    let operacion =
+        document.getElementById("operacion").value;
+
+    let stock =
+        document.getElementById("panelStock");
+
+    let movimiento =
+        document.getElementById("panelMovimiento");
+
+    if(operacion === "stock"){
+        stock.classList.remove("oculto");
+        movimiento.classList.add("oculto");
+    }else{
+        stock.classList.add("oculto");
+        movimiento.classList.remove("oculto");
+    }
+
+}
+
+function mostrarLease(){
+
+    const ownership =
+        document.getElementById("ownershipType").value;
+
+    const bloque =
+        document.getElementById("leaseBlock");
+
+    if(ownership === "leased"){
+        bloque.classList.remove("oculto");
+    }else{
+        bloque.classList.add("oculto");
+    }
+
+}
+
+function agregarKit(){
+
+    let kit =
+        document.getElementById("kitInput")
+        .value
+        .trim()
+        .toUpperCase();
+
+    if(!kit){
+        return;
+    }
+
+    if(equipos.includes(kit)){
+        alert("El kit ya fue agregado");
+        return;
+    }
+
+    equipos.push(kit);
+
+    document.getElementById("kitInput").value="";
+
+    actualizarLista();
+
+}
+
+function actualizarLista(){
+
+    document.getElementById("contador").innerText =
+        equipos.length;
+
+    const lista =
+        document.getElementById("lista");
+
+    lista.innerHTML = "";
+
+    equipos.forEach(kit=>{
+
+        let li =
+            document.createElement("li");
+
+        li.innerText = kit;
+
+        lista.appendChild(li);
+
+    });
+
+}
+
+function limpiarLista(){
+
+    equipos = [];
+
+    actualizarLista();
+
+}
+
+function generarCSV(){
+
+    let operacion =
+        document.getElementById("operacion").value;
+
+    let csv = "";
+
+    if(operacion === "stock"){
+
+        let motivo =
+            document.getElementById("reason").value;
+
+        let ubicacion =
+            document.getElementById("location").value;
+
+        csv =
+            "kitId,state,reason,location\n";
+
+        equipos.forEach(kit=>{
+
+            csv +=
+`${kit},in_stock,${motivo},${ubicacion}\n`;
+
+        });
+
+    }
+
+    else{
+
+        let ownership =
+            document.getElementById("ownershipType").value;
+
+        let contrato =
+            document.getElementById("ownershipContractRef").value;
+
+        let lease =
+            document.getElementById("ownershipLeaseEndsAt").value;
+
+        csv =
+"kitId,kitSerialNumber,inventoryState,serviceLineState,location,partnerId,customerId,updatedAt,ownershipType,ownershipContractRef,ownershipLeaseEndsAt\n";
+
+        equipos.forEach(kit=>{
+
+            csv +=
+`${kit},,${operacion},,,,,,${ownership},${contrato},${lease}\n`;
+
+        });
+
+    }
+
+    const blob =
+        new Blob([csv],
+        {type:"text/csv"});
+
+    const link =
+        document.createElement("a");
+
+    link.href =
+        URL.createObjectURL(blob);
+
+    link.download =
+        "inventario.csv";
+
+    link.click();
+
+}
+
+cambiarOperacion();
+
+</script>
+
+</body>
+</html>
