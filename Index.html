@@ -7,7 +7,6 @@
 <title>Inventario Starlink</title>
 
 <style>
-
 *{
     box-sizing:border-box;
     font-family:Arial,sans-serif;
@@ -30,12 +29,6 @@ body{
 h1{
     text-align:center;
     color:#16325c;
-    margin-bottom:20px;
-}
-
-h2{
-    color:#16325c;
-    margin-top:0;
 }
 
 label{
@@ -45,8 +38,7 @@ label{
     font-weight:bold;
 }
 
-input,
-select{
+input,select{
     width:100%;
     padding:12px;
     border:1px solid #ccc;
@@ -59,8 +51,8 @@ button{
     margin-top:10px;
     border:none;
     border-radius:8px;
-    font-size:16px;
     color:white;
+    font-size:16px;
     cursor:pointer;
 }
 
@@ -76,30 +68,28 @@ button{
     background:#dc3545;
 }
 
+.oculto{
+    display:none;
+}
+
 ul{
     list-style:none;
-    margin:0;
     padding:0;
 }
 
 li{
-    background:#f7f7f7;
-    margin-bottom:5px;
+    background:#f5f5f5;
     padding:10px;
+    margin-bottom:5px;
     border-radius:6px;
-}
-
-.oculto{
-    display:none;
 }
 
 .badge{
     background:#16325c;
     color:white;
-    padding:3px 8px;
+    padding:4px 8px;
     border-radius:10px;
 }
-
 </style>
 
 </head>
@@ -109,133 +99,144 @@ li{
 
 <div class="card">
 
-    <h2>Operación</h2>
+<label>Operación</label>
 
-    <select id="operacion" onchange="cambiarOperacion()">
-        <option value="stock">Alta de Stock</option>
-        <option value="reserved">Reserva</option>
-        <option value="shipped">Despacho</option>
-        <option value="delivered">Entrega</option>
-    </select>
+<select id="operacion" onchange="cambiarOperacion()">
+    <option value="stock">Alta Stock</option>
+    <option value="reserved">Reserva</option>
+    <option value="shipped">Despacho</option>
+    <option value="delivered">Entrega</option>
+</select>
 
 </div>
 
 <div class="card" id="panelStock">
 
-    <h2>Alta de Stock</h2>
+<label>Ubicación</label>
 
-    <label>Ubicación</label>
+<select id="location">
+    <option>Quesada</option>
+    <option>CdS - NQN</option>
+    <option>Depo PE</option>
+    <option>Ramm</option>
+</select>
 
-    <select id="location">
-        <option>Quesada</option>
-        <option>CdS - NQN</option>
-        <option>Depo PE</option>
-        <option>Ramm</option>
-    </select>
+<label>Motivo</label>
 
-    <label>Motivo</label>
-
-    <input id="reason" value="Ingreso de equipo nuevo">
+<input
+id="reason"
+value="Ingreso de equipo nuevo">
 
 </div>
 
 <div class="card oculto" id="panelMovimiento">
 
-    <h2>Datos Comerciales</h2>
+<label>Partner</label>
 
-    <label>Partner</label>
+<select id="partnerId">
+<option value="">Seleccione Partner</option>
+<option value="ait">AITUE</option>
+<option value="cirion">CIRION</option>
+<option value="cmpc">CMPC</option>
+<option value="itx-pe">INTERNEXA</option>
+<option value="muncl">MUNDO</option>
+<option value="redc">REDCOL</option>
+<option value="sonda">SONDA</option>
+<option value="tpzarg">TPZ-Argentina</option>
+<option value="tpzchile">TPZ-Chile</option>
+<option value="tpzcol">TPZ-Colombia</option>
+<option value="tpzcostarica">TPZ-Costa Rica</option>
+<option value="tpzdemo">TPZ-Ops</option>
+<option value="tpzglobal">TPZ-Global</option>
+<option value="tpzperu">TPZ-Peru</option>
+</select>
 
-    <select id="partnerId">
-        <option value="">Seleccione Partner</option>
-        <option value="ait">AITUE</option>
-        <option value="cirion">CIRION</option>
-        <option value="cmpc">CMPC</option>
-        <option value="itx-pe">INTERNEXA</option>
-        <option value="muncl">MUNDO</option>
-        <option value="redc">REDCOL</option>
-        <option value="sonda">SONDA</option>
-        <option value="tpzarg">TPZ-Argentina</option>
-        <option value="tpzchile">TPZ-Chile</option>
-        <option value="tpzcol">TPZ-Colombia</option>
-        <option value="tpzcostarica">TPZ-Costa Rica</option>
-        <option value="tpzdemo">TPZ-Ops</option>
-        <option value="tpzglobal">TPZ-Global</option>
-        <option value="tpzperu">TPZ-Peru</option>
-    </select>
+<label>Customer</label>
 
-    <label>Customer</label>
-    <input id="customerId">
+<input
+id="customerId"
+placeholder="Customer ID">
 
-    <label>Ownership</label>
+<label>Ownership</label>
 
-    <select id="ownershipType" onchange="mostrarLease()">
-        <option value="byo">BYO (Venta)</option>
-        <option value="leased">Leased</option>
-        <option value="owned">Owned</option>
-    </select>
+<select
+id="ownershipType"
+onchange="mostrarLease()">
 
-    <div id="leaseBlock" class="oculto">
+<option value="byo">BYO</option>
+<option value="leased">Leased</option>
+<option value="owned">Owned</option>
 
-        <label>Contrato</label>
-        <input id="ownershipContractRef">
+</select>
 
-        <label>Fin Leasing</label>
-        <input type="date" id="ownershipLeaseEndsAt">
+<div id="leaseBlock" class="oculto">
 
-    </div>
+<label>Contrato Leasing</label>
+
+<input id="ownershipContractRef">
+
+<label>Fin Leasing</label>
+
+<input
+type="date"
+id="ownershipLeaseEndsAt">
+
+</div>
 
 </div>
 
 <div class="card">
 
-    <h2>Carga de Kits</h2>
+<label>Kit ID</label>
 
-    <label>Kit ID</label>
+<input
+id="kitInput"
+placeholder="KIT00001"
+onkeypress="if(event.key==='Enter') agregarKit()">
 
-    <input
-        id="kitInput"
-        placeholder="Ej: KIT00001">
+<button
+class="btnAgregar"
+onclick="agregarKit()">
 
-    <button
-        class="btnAgregar"
-        onclick="agregarKit()">
+➕ Agregar Kit
 
-        ➕ Agregar Kit
-
-    </button>
+</button>
 
 </div>
 
 <div class="card">
 
-    <h2>
-        Equipos Cargados
-        <span
-            id="contador"
-            class="badge">
+<h3>
 
-            0
+Equipos Cargados
 
-        </span>
-    </h2>
+<span
+id="contador"
+class="badge">
 
-    <ul id="lista"></ul>
+0
 
-    <button
-        class="btnCSV"
-        onclick="generarCSV()">
+</span>
 
-        ⬇ Descargar CSV
+</h3>
 
-    </button>
+<ul id="lista"></ul>
 
-    <button
-        class="btnLimpiar"
-        onclick="limpiarLista()">
+<button
+class="btnCSV"
+onclick="generarCSV()">
 
-        🗑 Limpiar Lista
+⬇ Descargar CSV
 
-    </button>
+</button>
+
+<button
+class="btnLimpiar"
+onclick="limpiarLista()">
+
+🗑 Limpiar Lista
+
+</button>
 
 </div>
 
@@ -245,13 +246,13 @@ let equipos = [];
 
 function cambiarOperacion(){
 
-    let operacion =
+    const operacion =
         document.getElementById("operacion").value;
 
-    let panelStock =
+    const panelStock =
         document.getElementById("panelStock");
 
-    let panelMovimiento =
+    const panelMovimiento =
         document.getElementById("panelMovimiento");
 
     if(operacion === "stock"){
@@ -259,8 +260,7 @@ function cambiarOperacion(){
         panelStock.classList.remove("oculto");
         panelMovimiento.classList.add("oculto");
 
-    }
-    else{
+    }else{
 
         panelStock.classList.add("oculto");
         panelMovimiento.classList.remove("oculto");
@@ -271,20 +271,19 @@ function cambiarOperacion(){
 
 function mostrarLease(){
 
-    let ownership =
+    const tipo =
         document.getElementById("ownershipType").value;
 
-    let leaseBlock =
+    const bloque =
         document.getElementById("leaseBlock");
 
-    if(ownership === "leased"){
+    if(tipo === "leased"){
 
-        leaseBlock.classList.remove("oculto");
+        bloque.classList.remove("oculto");
 
-    }
-    else{
+    }else{
 
-        leaseBlock.classList.add("oculto");
+        bloque.classList.add("oculto");
 
     }
 
@@ -292,24 +291,24 @@ function mostrarLease(){
 
 function agregarKit(){
 
-    let kit =
+    const kit =
         document.getElementById("kitInput")
         .value
         .trim()
         .toUpperCase();
 
-    if(kit === ""){
-        return;
-    }
+    if(kit === "") return;
 
     if(equipos.includes(kit)){
-        alert("El kit ya existe.");
+
+        alert("El kit ya está cargado");
         return;
+
     }
 
     equipos.push(kit);
 
-    document.getElementById("kitInput").value="";
+    document.getElementById("kitInput").value = "";
 
     actualizarLista();
 
@@ -317,24 +316,36 @@ function agregarKit(){
 
 function actualizarLista(){
 
-    document.getElementById("contador").innerText =
-        equipos.length;
-
-    let lista =
+    const lista =
         document.getElementById("lista");
 
     lista.innerHTML = "";
 
-    equipos.forEach(function(kit){
+    document.getElementById("contador").innerText =
+        equipos.length;
+
+    equipos.forEach((kit,index)=>{
 
         let li =
             document.createElement("li");
 
-        li.innerText = kit;
+        li.innerHTML =
+            kit +
+            ' <a href="#" onclick="eliminarKit(' +
+            index +
+            ');return false;">❌</a>';
 
         lista.appendChild(li);
 
     });
+
+}
+
+function eliminarKit(index){
+
+    equipos.splice(index,1);
+
+    actualizarLista();
 
 }
 
@@ -348,18 +359,32 @@ function limpiarLista(){
 
 function generarCSV(){
 
-    let operacion =
+    if(equipos.length === 0){
+
+        alert("No hay kits cargados");
+        return;
+
+    }
+
+    const operacion =
         document.getElementById("operacion").value;
 
     let csv = "";
 
     if(operacion === "stock"){
 
-        let motivo =
+        const motivo =
             document.getElementById("reason").value;
 
-        let ubicacion =
+        const ubicacion =
             document.getElementById("location").value;
 
         csv =
-            "kitId,
+            "kitId,state,reason,location\n";
+
+        equipos.forEach(kit=>{
+
+            csv +=
+`${kit},in_stock,${motivo},${ubicacion}\n`;
+
+        
