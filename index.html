@@ -30,12 +30,16 @@ label{
     margin-top:10px;
     margin-bottom:5px;
     font-weight:bold;
+    font-size: 14px;
+    color: #333;
+    text-transform: uppercase;
 }
 input,select{
     width:100%;
     padding:12px;
     border:1px solid #ccc;
     border-radius:8px;
+    font-size: 16px;
 }
 button{
     width:100%;
@@ -46,40 +50,77 @@ button{
     color:white;
     font-size:16px;
     cursor:pointer;
+    font-weight: bold;
 }
 .btnAgregar{ background:#28a745; }
-.btnEscanear{ background:#6c757d; }
+.btnEscanear{ background:#495057; }
 .btnDetener{ background:#dc3545; margin-top: 5px; }
-.btnCSV{ background:#0078d4; }
+.btnCSV{ background:#28a745; }
 .btnLimpiar{ background:#dc3545; }
 .oculto{ display:none; }
 ul{
     list-style:none;
     padding:0;
+    margin: 0;
 }
 li{
     background:#f5f5f5;
-    padding:10px;
-    margin-bottom:5px;
+    padding:12px;
+    margin-bottom:8px;
     border-radius:6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-weight: bold;
+    color: #16325c;
 }
 .badge{
     background:#16325c;
     color:white;
-    padding:4px 8px;
+    padding:4px 10px;
     border-radius:10px;
+    font-size: 14px;
+}
+/* Contenedor de la cámara con esquinas de enfoque */
+#scanner-container {
+    position: relative;
+    width: 100%;
+    background: #111;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 10px;
 }
 #reader{
     width: 100%;
-    margin-top: 10px;
-    border-radius: 8px;
-    overflow: hidden;
+}
+.viewfinder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 120px;
+    border: 2px dashed rgba(255,255,255,0.4);
+    pointer-events: none;
+    box-sizing: border-box;
+}
+.viewfinder::before, .viewfinder::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    border-color: white;
+    border-style: solid;
+}
+.viewfinder::before { top: -2px; left: -2px; border-width: 4px 0 0 4px; }
+.viewfinder::after { top: -2px; right: -2px; border-width: 4px 4px 0 0; }
+.viewfinder-bottom-left {
+    position: absolute; bottom: -2px; left: -2px; width: 25px; height: 25px; border-color: white; border-style: solid; border-width: 0 0 4px 4px;
+}
+.viewfinder-bottom-right {
+    position: absolute; bottom: -2px; right: -2px; width: 25px; height: 25px; border-color: white; border-style: solid; border-width: 0 4px 4px 0;
 }
 </style>
-<!-- Librería para escaneo de códigos de barras / QR -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
@@ -101,10 +142,10 @@ li{
     <select id="location">
         <option>Quesada</option>
         <option>CdS - NQN</option>
-        <option>Depo PE</option>
+        <option value="Depo PE">Depo PE</option>
         <option>Ramm</option>
     </select>
-    <label>Motivo</label>
+    <label>Motivo / Remito</label>
     <input id="reason" value="Ingreso de equipo nuevo">
 </div>
 
@@ -128,8 +169,8 @@ li{
         <option value="tpzperu">TPZ-Peru</option>
     </select>
 
-    <label>Customer</label>
-    <input id="customerId" placeholder="Customer ID">
+    <label>Cliente Destino (Customer)</label>
+    <input id="customerId" placeholder="Ej: PASON">
 
     <label>Ownership</label>
     <select id="ownershipType" onchange="mostrarLease()">
@@ -148,20 +189,30 @@ li{
 </div>
 
 <div class="card">
-    <label>Kit ID</label>
-    <input id="kitInput" placeholder="KIT00001" onkeypress="if(event.key==='Enter') agregarKit()">
+    <label>📷 Escáner de Códigos</label>
+    <button class="btnEscanear" onclick="iniciarEscaneo()">▶ Activar Cámara</button>
     
-    <button class="btnAgregar" onclick="agregarKit()">➕ Agregar Kit</button>
-    <button class="btnEscanear" onclick="iniciarEscaneo()">📷 Escanear con Cámara</button>
+    <div id="scanner-container" class="oculto">
+        <div id="reader"></div>
+        <div class="viewfinder">
+            <div class="viewfinder-bottom-left"></div>
+            <div class="viewfinder-bottom-right"></div>
+        </div>
+    </div>
+    <button id="btnDetenerCamara" class="btnDetener oculto" onclick="detenerEscaneo()">❌ Apagar Cámara</button>
     
-    <div id="reader" class="oculto"></div>
-    <button id="btnDetenerCamara" class="btnDetener oculto" onclick="detenerEscaneo()">❌ Cerrar Cámara</button>
+    <label style="margin-top: 15px;">Kit ID Manual o Escaneado</label>
+    <div style="display: flex; gap: 10px;">
+        <!-- Se agregó oninput para forzar mayúsculas automáticamente al escribir -->
+        <input id="kitInput" placeholder="Ej: KIT123456789" oninput="this.value = this.value.toUpperCase()" onkeypress="if(event.key==='Enter') agregarKit()" style="flex: 1;">
+        <button class="btnAgregar" onclick="agregarKit()" style="width: 120px; margin-top: 0;">➕ Agregar</button>
+    </div>
 </div>
 
 <div class="card">
-    <h3>Equipos Cargados <span id="contador" class="badge">0</span></h3>
+    <h3>Equipos Escaneados <span id="contador" class="badge">0</span></h3>
     <ul id="lista"></ul>
-    <button class="btnCSV" onclick="generarCSV()">⬇ Descargar CSV</button>
+    <button class="btnCSV" onclick="generarCSV()" style="margin-top: 15px;">⬇ Descargar CSV</button>
     <button class="btnLimpiar" onclick="limpiarLista()">🗑 Limpiar Lista</button>
 </div>
 
@@ -202,6 +253,7 @@ function agregarKit(){
 
     if(equipos.includes(kit)){
         alert("El kit ya está cargado");
+        kitInput.value = "";
         return;
     }
 
@@ -217,7 +269,7 @@ function actualizarLista(){
 
     equipos.forEach((kit, index) => {
         let li = document.createElement("li");
-        li.innerHTML = kit + ' <a href="#" onclick="eliminarKit(' + index + ');return false;" style="text-decoration:none;">❌</a>';
+        li.innerHTML = kit + ' <a href="#" onclick="eliminarKit(' + index + ');return false;" style="text-decoration:none; color: #dc3545; font-size: 18px;">❌</a>';
         lista.appendChild(li);
     });
 }
@@ -233,10 +285,10 @@ function limpiarLista(){
 }
 
 function iniciarEscaneo() {
-    const readerDiv = document.getElementById("reader");
+    const container = document.getElementById("scanner-container");
     const btnDetener = document.getElementById("btnDetenerCamara");
     
-    readerDiv.classList.remove("oculto");
+    container.classList.remove("oculto");
     btnDetener.classList.remove("oculto");
 
     if (!html5QrCode) {
@@ -244,22 +296,21 @@ function iniciarEscaneo() {
     }
 
     html5QrCode.start(
-        { facingMode: "environment" }, // Usa la cámara trasera por defecto
+        { facingMode: "environment" },
         {
-            fps: 10,
-            qrbox: { width: 250, height: 150 }
+            fps: 15,
+            qrbox: { width: 250, height: 120 }
         },
         (decodedText, decodedResult) => {
-            // Al detectar un código con éxito
             document.getElementById("kitInput").value = decodedText.trim().toUpperCase();
-            detenerEscaneo();
-            agregarKit(); // Lo agrega automáticamente a la lista
+            agregarKit();
+            if (navigator.vibrate) navigator.vibrate(100);
         },
         (errorMessage) => {
-            // Errores de frame (se ignoran para que siga buscando fluidamente)
+            // Ignorar errores de frame para lectura continua
         }
     ).catch(err => {
-        alert("No se pudo acceder a la cámara. Asegúrate de dar permisos o usar HTTPS.");
+        alert("No se pudo acceder a la cámara. Asegúrate de dar permisos.");
         detenerEscaneo();
     });
 }
@@ -267,13 +318,13 @@ function iniciarEscaneo() {
 function detenerEscaneo() {
     if (html5QrCode && html5QrCode.isScanning) {
         html5QrCode.stop().then(() => {
-            document.getElementById("reader").classList.add("oculto");
+            document.getElementById("scanner-container").classList.add("oculto");
             document.getElementById("btnDetenerCamara").classList.add("oculto");
         }).catch(err => {
-            console.error("Error al detener la cámara", err);
+            console.error("Error al detener", err);
         });
     } else {
-        document.getElementById("reader").classList.add("oculto");
+        document.getElementById("scanner-container").classList.add("oculto");
         document.getElementById("btnDetenerCamara").classList.add("oculto");
     }
 }
@@ -281,35 +332,34 @@ function detenerEscaneo() {
 function generarCSV(){
     if(equipos.length === 0){
         alert("No hay kits cargados");
-        consoleg.log("No kits");
         return;
     }
 
     const operacion = document.getElementById("operacion").value;
-    let csv = "";
+    let csvContent = "";
 
     if(operacion === "stock"){
-        const motivo = document.getElementById("reason").value;
-        const ubicacion = document.getElementById("location").value;
+        const motivo = document.getElementById("reason").value.trim();
+        const ubicacion = document.getElementById("location").value.trim();
         
-        csv = "kitId,state,reason,location\n";
+        csvContent = "kitId,state,reason,location\n";
         equipos.forEach(kit => {
-            csv += `${kit},in_stock,${motivo},${ubicacion}\n`;
+            csvContent += `${kit},in_stock,${motivo},${ubicacion}\n`;
         });
     } else {
-        const partner = document.getElementById("partnerId").value;
-        const customer = document.getElementById("customerId").value;
-        const ownership = document.getElementById("ownershipType").value;
-        const contractRef = document.getElementById("ownershipContractRef").value;
-        const leaseEnds = document.getElementById("ownershipLeaseEndsAt").value;
+        const partner = document.getElementById("partnerId").value.trim();
+        const customer = document.getElementById("customerId").value.trim();
+        const ownership = document.getElementById("ownershipType").value.trim();
+        const contractRef = document.getElementById("ownershipContractRef").value.trim();
+        const leaseEnds = document.getElementById("ownershipLeaseEndsAt").value.trim();
 
-        csv = "kitId,state,partnerId,customerId,ownershipType,ownershipContractRef,ownershipLeaseEndsAt\n";
+        csvContent = "kitId,state,partnerId,customerId,ownershipType,ownershipContractRef,ownershipLeaseEndsAt\n";
         equipos.forEach(kit => {
-            csv += `${kit},${operacion},${partner},${customer},${ownership},${contractRef},${leaseEnds}\n`;
+            csvContent += `${kit},${operacion},${partner},${customer},${ownership},${contractRef},${leaseEnds}\n`;
         });
     }
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
