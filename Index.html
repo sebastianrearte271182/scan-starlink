@@ -3,21 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Inventario Starlink</title>
-
 <style>
 *{
     box-sizing:border-box;
     font-family:Arial,sans-serif;
 }
-
 body{
     margin:0;
     padding:15px;
     background:#f4f6f9;
 }
-
 .card{
     background:white;
     padding:20px;
@@ -25,26 +21,22 @@ body{
     margin-bottom:15px;
     box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
-
 h1{
     text-align:center;
     color:#16325c;
 }
-
 label{
     display:block;
     margin-top:10px;
     margin-bottom:5px;
     font-weight:bold;
 }
-
 input,select{
     width:100%;
     padding:12px;
     border:1px solid #ccc;
     border-radius:8px;
 }
-
 button{
     width:100%;
     padding:14px;
@@ -55,35 +47,23 @@ button{
     font-size:16px;
     cursor:pointer;
 }
-
-.btnAgregar{
-    background:#28a745;
-}
-
-.btnCSV{
-    background:#0078d4;
-}
-
-.btnLimpiar{
-    background:#dc3545;
-}
-
-.oculto{
-    display:none;
-}
-
+.btnAgregar{ background:#28a745; }
+.btnCSV{ background:#0078d4; }
+.btnLimpiar{ background:#dc3545; }
+.oculto{ display:none; }
 ul{
     list-style:none;
     padding:0;
 }
-
 li{
     background:#f5f5f5;
     padding:10px;
     margin-bottom:5px;
     border-radius:6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-
 .badge{
     background:#16325c;
     color:white;
@@ -91,300 +71,193 @@ li{
     border-radius:10px;
 }
 </style>
-
 </head>
 <body>
 
 <h1>📦 Inventario Starlink</h1>
 
 <div class="card">
-
-<label>Operación</label>
-
-<select id="operacion" onchange="cambiarOperacion()">
-    <option value="stock">Alta Stock</option>
-    <option value="reserved">Reserva</option>
-    <option value="shipped">Despacho</option>
-    <option value="delivered">Entrega</option>
-</select>
-
+    <label>Operación</label>
+    <select id="operacion" onchange="cambiarOperacion()">
+        <option value="stock">Alta Stock</option>
+        <option value="reserved">Reserva</option>
+        <option value="shipped">Despacho</option>
+        <option value="delivered">Entrega</option>
+    </select>
 </div>
 
 <div class="card" id="panelStock">
-
-<label>Ubicación</label>
-
-<select id="location">
-    <option>Quesada</option>
-    <option>CdS - NQN</option>
-    <option>Depo PE</option>
-    <option>Ramm</option>
-</select>
-
-<label>Motivo</label>
-
-<input
-id="reason"
-value="Ingreso de equipo nuevo">
-
+    <label>Ubicación</label>
+    <select id="location">
+        <option>Quesada</option>
+        <option>CdS - NQN</option>
+        <option>Depo PE</option>
+        <option>Ramm</option>
+    </select>
+    <label>Motivo</label>
+    <input id="reason" value="Ingreso de equipo nuevo">
 </div>
 
 <div class="card oculto" id="panelMovimiento">
+    <label>Partner</label>
+    <select id="partnerId">
+        <option value="">Seleccione Partner</option>
+        <option value="ait">AITUE</option>
+        <option value="cirion">CIRION</option>
+        <option value="cmpc">CMPC</option>
+        <option value="itx-pe">INTERNEXA</option>
+        <option value="muncl">MUNDO</option>
+        <option value="redc">REDCOL</option>
+        <option value="sonda">SONDA</option>
+        <option value="tpzarg">TPZ-Argentina</option>
+        <option value="tpzchile">TPZ-Chile</option>
+        <option value="tpzcol">TPZ-Colombia</option>
+        <option value="tpzcostarica">TPZ-Costa Rica</option>
+        <option value="tpzdemo">TPZ-Ops</option>
+        <option value="tpzglobal">TPZ-Global</option>
+        <option value="tpzperu">TPZ-Peru</option>
+    </select>
 
-<label>Partner</label>
+    <label>Customer</label>
+    <input id="customerId" placeholder="Customer ID">
 
-<select id="partnerId">
-<option value="">Seleccione Partner</option>
-<option value="ait">AITUE</option>
-<option value="cirion">CIRION</option>
-<option value="cmpc">CMPC</option>
-<option value="itx-pe">INTERNEXA</option>
-<option value="muncl">MUNDO</option>
-<option value="redc">REDCOL</option>
-<option value="sonda">SONDA</option>
-<option value="tpzarg">TPZ-Argentina</option>
-<option value="tpzchile">TPZ-Chile</option>
-<option value="tpzcol">TPZ-Colombia</option>
-<option value="tpzcostarica">TPZ-Costa Rica</option>
-<option value="tpzdemo">TPZ-Ops</option>
-<option value="tpzglobal">TPZ-Global</option>
-<option value="tpzperu">TPZ-Peru</option>
-</select>
+    <label>Ownership</label>
+    <select id="ownershipType" onchange="mostrarLease()">
+        <option value="byo">BYO</option>
+        <option value="leased">Leased</option>
+        <option value="owned">Owned</option>
+    </select>
 
-<label>Customer</label>
-
-<input
-id="customerId"
-placeholder="Customer ID">
-
-<label>Ownership</label>
-
-<select
-id="ownershipType"
-onchange="mostrarLease()">
-
-<option value="byo">BYO</option>
-<option value="leased">Leased</option>
-<option value="owned">Owned</option>
-
-</select>
-
-<div id="leaseBlock" class="oculto">
-
-<label>Contrato Leasing</label>
-
-<input id="ownershipContractRef">
-
-<label>Fin Leasing</label>
-
-<input
-type="date"
-id="ownershipLeaseEndsAt">
-
-</div>
-
+    <div id="leaseBlock" class="oculto">
+        <label>Contrato Leasing</label>
+        <input id="ownershipContractRef">
+        
+        <label>Fin Leasing</label>
+        <input type="date" id="ownershipLeaseEndsAt">
+    </div>
 </div>
 
 <div class="card">
-
-<label>Kit ID</label>
-
-<input
-id="kitInput"
-placeholder="KIT00001"
-onkeypress="if(event.key==='Enter') agregarKit()">
-
-<button
-class="btnAgregar"
-onclick="agregarKit()">
-
-➕ Agregar Kit
-
-</button>
-
+    <label>Kit ID</label>
+    <input id="kitInput" placeholder="KIT00001" onkeypress="if(event.key==='Enter') agregarKit()">
+    <button class="btnAgregar" onclick="agregarKit()">➕ Agregar Kit</button>
 </div>
 
 <div class="card">
-
-<h3>
-
-Equipos Cargados
-
-<span
-id="contador"
-class="badge">
-
-0
-
-</span>
-
-</h3>
-
-<ul id="lista"></ul>
-
-<button
-class="btnCSV"
-onclick="generarCSV()">
-
-⬇ Descargar CSV
-
-</button>
-
-<button
-class="btnLimpiar"
-onclick="limpiarLista()">
-
-🗑 Limpiar Lista
-
-</button>
-
+    <h3>Equipos Cargados <span id="contador" class="badge">0</span></h3>
+    <ul id="lista"></ul>
+    <button class="btnCSV" onclick="generarCSV()">⬇ Descargar CSV</button>
+    <button class="btnLimpiar" onclick="limpiarLista()">🗑 Limpiar Lista</button>
 </div>
 
 <script>
-
 let equipos = [];
 
 function cambiarOperacion(){
-
-    const operacion =
-        document.getElementById("operacion").value;
-
-    const panelStock =
-        document.getElementById("panelStock");
-
-    const panelMovimiento =
-        document.getElementById("panelMovimiento");
+    const operacion = document.getElementById("operacion").value;
+    const panelStock = document.getElementById("panelStock");
+    const panelMovimiento = document.getElementById("panelMovimiento");
 
     if(operacion === "stock"){
-
         panelStock.classList.remove("oculto");
         panelMovimiento.classList.add("oculto");
-
-    }else{
-
+    } else {
         panelStock.classList.add("oculto");
         panelMovimiento.classList.remove("oculto");
-
     }
-
 }
 
 function mostrarLease(){
-
-    const tipo =
-        document.getElementById("ownershipType").value;
-
-    const bloque =
-        document.getElementById("leaseBlock");
+    const tipo = document.getElementById("ownershipType").value;
+    const bloque = document.getElementById("leaseBlock");
 
     if(tipo === "leased"){
-
         bloque.classList.remove("oculto");
-
-    }else{
-
+    } else {
         bloque.classList.add("oculto");
-
     }
-
 }
 
 function agregarKit(){
-
-    const kit =
-        document.getElementById("kitInput")
-        .value
-        .trim()
-        .toUpperCase();
+    const kitInput = document.getElementById("kitInput");
+    const kit = kitInput.value.trim().toUpperCase();
 
     if(kit === "") return;
 
     if(equipos.includes(kit)){
-
         alert("El kit ya está cargado");
         return;
-
     }
 
     equipos.push(kit);
-
-    document.getElementById("kitInput").value = "";
-
+    kitInput.value = "";
     actualizarLista();
-
 }
 
 function actualizarLista(){
-
-    const lista =
-        document.getElementById("lista");
-
+    const lista = document.getElementById("lista");
     lista.innerHTML = "";
+    document.getElementById("contador").innerText = equipos.length;
 
-    document.getElementById("contador").innerText =
-        equipos.length;
-
-    equipos.forEach((kit,index)=>{
-
-        let li =
-            document.createElement("li");
-
-        li.innerHTML =
-            kit +
-            ' <a href="#" onclick="eliminarKit(' +
-            index +
-            ');return false;">❌</a>';
-
+    equipos.forEach((kit, index) => {
+        let li = document.createElement("li");
+        li.innerHTML = kit + ' <a href="#" onclick="eliminarKit(' + index + ');return false;" style="text-decoration:none;">❌</a>';
         lista.appendChild(li);
-
     });
-
 }
 
 function eliminarKit(index){
-
-    equipos.splice(index,1);
-
+    equipos.splice(index, 1);
     actualizarLista();
-
 }
 
 function limpiarLista(){
-
     equipos = [];
-
     actualizarLista();
-
 }
 
 function generarCSV(){
-
     if(equipos.length === 0){
-
         alert("No hay kits cargados");
         return;
-
     }
 
-    const operacion =
-        document.getElementById("operacion").value;
-
+    const operacion = document.getElementById("operacion").value;
     let csv = "";
 
     if(operacion === "stock"){
-
-        const motivo =
-            document.getElementById("reason").value;
-
-        const ubicacion =
-            document.getElementById("location").value;
-
-        csv =
-            "kitId,state,reason,location\n";
-
-        equipos.forEach(kit=>{
-
-            csv +=
-`${kit},in_stock,${motivo},${ubicacion}\n`;
-
+        const motivo = document.getElementById("reason").value;
+        const ubicacion = document.getElementById("location").value;
         
+        csv = "kitId,state,reason,location\n";
+        equipos.forEach(kit => {
+            csv += `${kit},in_stock,${motivo},${ubicacion}\n`;
+        });
+    } else {
+        const partner = document.getElementById("partnerId").value;
+        const customer = document.getElementById("customerId").value;
+        const ownership = document.getElementById("ownershipType").value;
+        const contractRef = document.getElementById("ownershipContractRef").value;
+        const leaseEnds = document.getElementById("ownershipLeaseEndsAt").value;
+
+        csv = "kitId,state,partnerId,customerId,ownershipType,ownershipContractRef,ownershipLeaseEndsAt\n";
+        equipos.forEach(kit => {
+            csv += `${kit},${operacion},${partner},${customer},${ownership},${contractRef},${leaseEnds}\n`;
+        });
+    }
+
+    // Disparar la descarga del archivo CSV
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `inventario_${operacion}_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>
